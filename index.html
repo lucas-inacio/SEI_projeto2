@@ -12,12 +12,25 @@
       <h1>Teste</h1>
     </header>
     <main class="row flex-fill w-80">
-      <div class="col-sm-3">
+      <div class="col-sm-3 flex-column d-flex justify-content-between">
         <div id="myTab" class="nav nav-pills flex-column" role="tablist" aria-orientation="vertical">
           <button class="nav-link active" aria-selected="true" role="tab" aria-controls="pill-param" data-bs-toggle="pill" id="param-tab" data-bs-target="#param">Parâmetros</button>
           <button class="nav-link" aria-selected="false" role="tab" aria-controls="pill-salv" data-bs-toggle="pill" id="salv-tab"  data-bs-target="#salv">Salvar dados</button>
           <button class="nav-link" aria-selected="false" role="tab" aria-controls="pill-ajuda" data-bs-toggle="pill" id="ajuda-tab"  data-bs-target="#ajuda">Ajuda</button>
           <button class="nav-link" aria-selected="false" role="tab" aria-controls="pill-fechar" id="fechar-tab">Fechar</button>
+        </div>
+        <div class="d-flex flex-column row-gap-2">
+          <div class="dropdown">
+            <button id="dropButton" class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Dropdown button
+            </button>
+            <ul id="dropMenu" class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </div>
+          <button class="btn btn-primary" type="button">Conectar</button>
         </div>
       </div>
       <div class="col-sm-9">
@@ -55,6 +68,7 @@
       <h3>Outro teste</h3>
     </footer>
   </div>
+  <script src="popper.min.js" type="text/javascript"></script>
   <script src="bootstrap.min.js" type="text/javascript"></script>
   <script src="chart.umd.min.js" type="text/javascript"></script>
   <script src="renderer.js" type="text/javascript"></script>
