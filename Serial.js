@@ -58,5 +58,5 @@ class Serial {
 }
 
 function ListPorts() {
-    return SerialPort.list();
+    return SerialPort.SerialPort.list();
 }
