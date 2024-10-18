@@ -21,14 +21,35 @@ function solicitaSaida() {
   ipcRenderer.invoke('checaSaida');
 }
 
+function atualizaDados(dados) {
+  const [ dadosTemp, dadosOxi, dadosBat ] = dados.split(':');
+  console.log(dadosTemp);
+  console.log(dadosBat);
+  console.log(dadosOxi);
+  acumulaTemp.push(dadosTemp);
+  acumulaBat.push(dadosBat);
+  acumulaOxi.push(dadosOxi);
+  plotterTemp.pushData('temperatura', [dadosTemp]);
+  plotterBat.pushData('batimento', [dadosBat]);
+  plotterOxi.pushData('oxi', [dadosOxi]);
+}
+
+function configuraBotaoConectar(texto) {
+  const botaoDrop = document.getElementById('dropButton');
+  botaoDrop.innerText = texto;
+}
+
+// Constrói o menu de portas seriais
+// retorna true se detectar portas
+// retorna false se não houver portas presentes
 function constroiMenu(itens) {
   const menuDrop = document.getElementById('dropMenu');
   const botaoDrop = document.getElementById('dropButton');
   menuDrop.innerHTML = ''; // Remove elementos anteriores
   
   if(!itens || itens.length === 0) {
-    botaoDrop.innerText = 'Nenhuma porta detectada';
-    return;
+    configuraBotaoConectar('Nenhuma porta detectada');
+    return false;
   }
 
   // Preenche o menu com a lista de nomes das portas seriais
@@ -49,6 +70,8 @@ function constroiMenu(itens) {
     });
   });
   botaoDrop.innerText = itens[0];
+
+  return true;
 }
 
 window.onload = function () {
@@ -79,26 +102,36 @@ window.onload = function () {
     for(const porta of listaPorta)
       nomes.push(porta.path);
 
-    constroiMenu(nomes);
+    if(!constroiMenu(nomes)) {
+      sPort = null;
+      const conectar = document.getElementById('conectar');
+      conectar.innerText = 'Conectar';
+    }
     setTimeout(obtemPortas, 3000);
   };
 
   obtemPortas();
 
-  sPort = new Serial();
-  sPort.onData((dados) => {
-    const [ dadosTemp, dadosOxi, dadosBat ] = dados.split(':');
-    console.log(dadosTemp);
-    console.log(dadosBat);
-    console.log(dadosOxi);
-    acumulaTemp.push(dadosTemp);
-    acumulaBat.push(dadosBat);
-    acumulaOxi.push(dadosOxi);
-    plotterTemp.pushData('temperatura', [dadosTemp]);
-    plotterBat.pushData('batimento', [dadosBat]);
-    plotterOxi.pushData('oxi', [dadosOxi]);
+  // Habilita porta serial escolhida
+  const conectar = document.getElementById('conectar');
+  conectar.addEventListener('click', async (e) => {
+    if(sPort) {
+      conectar.innerText = 'Conectar';
+      sPort.close();
+      sPort = null;
+    } else {
+      try {
+        const botaoDrop = document.getElementById('dropButton');
+        sPort = new Serial();
+        sPort.onData(atualizaDados);
+        await sPort.open(botaoDrop.innerText, {baudRate: 115200});
+        conectar.innerText = 'Desconectar';
+      } catch(e) {
+        console.log('Erro ao abrir porta');
+        sPort = null;
+      }
+    }
   });
-  sPort.open('COM5', { baudRate: 115200 });
 
   const salvar = document.getElementById('salvarDados');
   salvar.addEventListener('click', (e) => {
