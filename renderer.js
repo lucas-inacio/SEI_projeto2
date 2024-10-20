@@ -1,4 +1,6 @@
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, webUtils } = require('electron');
+const fs = require('fs').promises;
+const { EOL } = require('os');
 
 // Quantidade máxima de amostras a exibir
 const AMOSTRAS_MAX = 10;
@@ -13,15 +15,71 @@ let acumulaBat = [];
 let acumulaOxi = [];
 let horaDaAmostra = [];
 
-// Graáficos
+// Gráficos
 let plotterTemp = null;
 let plotterOxi = null;
 let plotterBat = null;
+
+// Informações de armazenamento de arquivos
+let caminhoDoArquivo = null;
+// false -> substitui arquivo; true -> salva periodicamente no mesmo arquivo
+let incrementarArquivo = false;
+// Há uma tarefa de escrita ainda não concluída
+let escritaPendente = false;
+
+function serializaDados(quantidade) {
+  const total = horaDaAmostra.length > quantidade ? quantidade : horaDaAmostra.length;
+  let dados = '';
+  for(let i = 0; i < total; i++) {
+    const data = new Date(horaDaAmostra[i]);
+    dados += 
+      data.getHours() + ':' +
+      data.getMinutes() + ':' +
+      data.getSeconds() + ' - ' +
+      acumulaTemp[i] + '°C - ' +
+      acumulaBat[i] + 'bpm - ' +
+      acumulaOxi[i] + '%' + EOL;
+  }
+  return dados;
+}
 
 // Comunica ao processo main.js que o usuário deseja
 // encerrar a aplicação
 function solicitaSaida() {
   ipcRenderer.invoke('checaSaida');
+}
+
+async function tarefaSalvarArquivo() {
+  if(caminhoDoArquivo) {
+    if(horaDaAmostra.length >= AMOSTRAS_MAX+5 && !escritaPendente) {
+      const dados = serializaDados(5);
+      try {
+        await salvarArquivo(caminhoDoArquivo, incrementarArquivo, dados);
+        acumulaBat.splice(0, 5);
+        acumulaTemp.splice(0, 5);
+        acumulaOxi.splice(0, 5);
+        horaDaAmostra.splice(0, 5);
+      } catch(e) {
+        console.log(e);
+      }
+    }
+
+    if(incrementarArquivo)
+      setTimeout(tarefaSalvarArquivo, 1000);
+  }
+}
+
+async function salvarArquivo(caminho, incrementar, dados) {
+  try {
+    if(incrementar) {
+      await fs.appendFile(caminho, dados, { flush: true });
+    } else {
+      await fs.writeFile(caminho, dados, { flush: true });
+    }
+  } catch(e) {
+    console.log(e);
+    throw e;
+  }
 }
 
 function limpaDados() {
@@ -51,9 +109,9 @@ function atualizaDados(amostra, novoTimestamp) {
   if(horaDaAmostra.length === 0 || 
     novoTimestamp - horaDaAmostra[horaDaAmostra.length - 1] >= 1000) {
 
-    acumulaBat.push(batimento);
-    acumulaOxi.push(oxigenacao);
-    acumulaTemp.push(temperatura);
+    acumulaBat.push(Number(batimento));
+    acumulaOxi.push(Number(oxigenacao));
+    acumulaTemp.push(Number(temperatura));
     horaDaAmostra.push(novoTimestamp);
   } else {
     acumulaBat[acumulaBat.length - 1] = batimento;
@@ -183,8 +241,38 @@ window.onload = function () {
     }
   });
 
+  // Armazenamento das amostras em arquivo
   const salvar = document.getElementById('salvarDados');
-  salvar.addEventListener('click', (e) => {
+  salvar.addEventListener('click', async (e) => {
     e.preventDefault();
+
+    if(escritaPendente) {
+      return;
+    }
+
+    const campoNomeDoArquivo = document.getElementById('formFile');
+    incrementarArquivo = document.getElementById('checkFile').checked;
+    if(campoNomeDoArquivo.files && campoNomeDoArquivo.files.length > 0) {
+      caminhoDoArquivo = webUtils.getPathForFile(campoNomeDoArquivo.files[0]);
+
+      if(incrementarArquivo) {
+        setTimeout(tarefaSalvarArquivo, 1000);
+      } else {
+        const dados = serializaDados(5);
+        console.log(dados);
+        try {
+          await salvarArquivo(caminhoDoArquivo, incrementarArquivo, dados);
+          acumulaBat.splice(0, 5);
+          acumulaTemp.splice(0, 5);
+          acumulaOxi.splice(0, 5);
+          horaDaAmostra.splice(0, 5);
+        } finally {
+          escritaPendente = false;
+        }
+      }
+
+      // console.log(caminhoDoArquivo);
+      // console.log(checkFile.checked);
+    }
   })
 };

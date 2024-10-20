@@ -25,7 +25,7 @@ class Serial {
         this.options = { ...this.options, ...options };
         let name = (platform === 'win32') ? '\\\\.\\' + portName : portName;
         this.port = new SerialPort.SerialPort({path: name, ...this.options});
-        this.parser = this.port.pipe(new ReadLineParser.ReadlineParser());
+        this.parser = this.port.pipe(new ReadLineParser.ReadlineParser({ includeDelimiter: false }));
         this.parser.on('data', amostra => {
             console.log(amostra);
             this.onDataCallback(amostra, new Date().getTime());
