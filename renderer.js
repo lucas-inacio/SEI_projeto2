@@ -79,6 +79,7 @@ function atualizaDados(amostra, novoTimestamp) {
       acumulaTemp.slice(-AMOSTRAS_MAX), horaDaAmostra.slice(-AMOSTRAS_MAX)));
 }
 
+// Atalho para mudar o texto do botão de Conectar/Desconectar
 function configuraBotaoConectar(texto) {
   const botaoDrop = document.getElementById('dropButton');
   botaoDrop.innerText = texto;
@@ -144,7 +145,7 @@ window.onload = function () {
   plotterOxi.addPlot('oxigenacao', []);
 
   // Obtem a lista de portas seriais disponíveis
-  // e atualiza o menu de portas    
+  // e atualiza o menu de portas a cada 3 segundos
   const obtemPortas = async () => {
     let nomes = [];
     const listaPorta = await ListPorts();
@@ -158,7 +159,6 @@ window.onload = function () {
     }
     setTimeout(obtemPortas, 3000);
   };
-
   obtemPortas();
 
   // Habilita porta serial escolhida
