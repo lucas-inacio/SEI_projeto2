@@ -1,7 +1,5 @@
 class SerialPlotter {
-  constructor(canvasContext, titulo, tipo, pointCount) {
-    this.pointCount = pointCount || 5;
-    this.data = {};
+  constructor(canvasContext, titulo, tipo) {
     this.chart = new Chart(canvasContext, {
       type: tipo || 'line',
       data: {
@@ -10,7 +8,16 @@ class SerialPlotter {
       options: {
         scales: {
           x: {
-            type: 'linear'
+            type: 'time',
+            time: {
+              displayFormat: {
+                second: 'HH:mm:ss'
+              },
+              unit: 'second'
+            },
+            ticks: {
+              source: 'data'
+            }
           },
           y: {
             beginAtZero: true
@@ -53,54 +60,25 @@ class SerialPlotter {
     });
   }
   
-  addPlot(label, data) {
-    let points = [];
-    for (let i = 0; i < data.length; ++i) {
-      points.push({x: i, y: data[i]});
-    }
-    this.data[label] = points;
-    this.chart.data.datasets.push({label, data: points});
+  // Adiciona amostras ao gráfico
+  // dados deve ter o formato [{x: <timestamp>, y: <valor>}, ...]
+  addPlot(rotulo, dados) {
+    this.chart.data.datasets.push({label: rotulo, data: dados});
     this.chart.update();
   }
   
   removeAllPlots() {
-    this.data = {};
     this.chart.data.datasets = [];
     this.chart.update();
   }
-  
-  getSize() {
-    return Object.keys(this.data).length;
-  }
-  
-  pushData(label, data) {
-    this.data[label].push(...data);
-    let newPoints = [];
-    let oldPoints = null;
-    // Remove os dados anteriores
-    if (this.data[label].length > this.pointCount) {
-      let diff = this.data[label].length - this.pointCount;
-      oldPoints = this.data[label].splice(0, diff);
-    }
-    
-    // Remapeia os índices entre 0 e 199
-    for (let i = 0; i < this.data[label].length - data.length; ++i) {
-      newPoints.push({x: i, y: this.data[label][i].y});
-    }
-    for (let i = this.data[label].length - data.length; i < this.data[label].length; ++i) {
-      newPoints.push({x: i, y: this.data[label][i]});
-    }
-    
-    for (let key in this.chart.data.datasets) {
-      if (this.chart.data.datasets[key].label === label) {
-        this.chart.data.datasets[key].data = newPoints;
-        break;
+
+  setData(rotulo, dados) {
+    for(let i in this.chart.data.datasets) {
+      if(this.chart.data.datasets[i].label === rotulo) {
+        this.chart.data.datasets[i].data = dados;
+        this.chart.update();
       }
     }
-    this.data[label] = newPoints;
-    this.chart.update();
-
-    return oldPoints;
   }
   
   // color deve ser uma string na forma 'rgb(r, g, b, a)'
@@ -138,8 +116,6 @@ class SerialPlotter {
   clear() {
     for (let data of this.chart.data.datasets)
       data.data = [];
-    for (let key in this.data)
-      this.data[key] = [];
     this.chart.update();
   }
 }

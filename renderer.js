@@ -1,5 +1,8 @@
 const { ipcRenderer } = require('electron');
 
+// Quantidade máxima de amostras a exibir
+const AMOSTRAS_MAX = 10;
+
 // Porta serial aberta atualmente
 let sPort = null;
 
@@ -21,17 +24,59 @@ function solicitaSaida() {
   ipcRenderer.invoke('checaSaida');
 }
 
-function atualizaDados(dados) {
-  const [ dadosTemp, dadosOxi, dadosBat ] = dados.split(':');
-  console.log(dadosTemp);
-  console.log(dadosBat);
-  console.log(dadosOxi);
-  acumulaTemp.push(dadosTemp);
-  acumulaBat.push(dadosBat);
-  acumulaOxi.push(dadosOxi);
-  plotterTemp.pushData('temperatura', [dadosTemp]);
-  plotterBat.pushData('batimento', [dadosBat]);
-  plotterOxi.pushData('oxi', [dadosOxi]);
+function limpaDados() {
+  if(plotterBat) plotterBat.clear();
+  if(plotterOxi) plotterOxi.clear();
+  if(plotterTemp) plotterTemp.clear();
+  acumulaBat = [];
+  acumulaOxi= [];
+  acumulaTemp = [];
+  horaDaAmostra = [];
+}
+
+function constroiAmostras(amostras, timestamps) {
+  const saida = [];
+  for(let i in amostras) {
+    saida.push({x: timestamps[i], y: amostras[i]});
+  }
+  return saida;
+}
+
+function atualizaDados(amostra, novoTimestamp) {
+  const [ temperatura, oxigenacao, batimento ] = amostra.split(':');
+
+  // Amostras devem ter no mínimo um segundo de distância entre si
+  // Se o timestamp for igual (até +-999 milisegundos), substitui
+  // pelo último valor fornecido
+  if(horaDaAmostra.length === 0 || 
+    novoTimestamp - horaDaAmostra[horaDaAmostra.length - 1] >= 1000) {
+
+    acumulaBat.push(batimento);
+    acumulaOxi.push(oxigenacao);
+    acumulaTemp.push(temperatura);
+    horaDaAmostra.push(novoTimestamp);
+  } else {
+    acumulaBat[acumulaBat.length - 1] = batimento;
+    acumulaOxi[acumulaOxi.length - 1] = oxigenacao;
+    acumulaTemp[acumulaTemp.length - 1] = temperatura;
+    horaDaAmostra[horaDaAmostra.length - 1] = novoTimestamp;
+  }
+
+  // Atualiza o gráfico
+  plotterBat.setData(
+    'batimento',
+    constroiAmostras(
+      acumulaBat.slice(-AMOSTRAS_MAX), horaDaAmostra.slice(-AMOSTRAS_MAX)));
+
+  plotterOxi.setData(
+    'oxigenacao',
+    constroiAmostras(
+      acumulaOxi.slice(-AMOSTRAS_MAX), horaDaAmostra.slice(-AMOSTRAS_MAX)));
+
+  plotterTemp.setData(
+    'temperatura',
+    constroiAmostras(
+      acumulaTemp.slice(-AMOSTRAS_MAX), horaDaAmostra.slice(-AMOSTRAS_MAX)));
 }
 
 function configuraBotaoConectar(texto) {
@@ -75,6 +120,10 @@ function constroiMenu(itens) {
 }
 
 window.onload = function () {
+  // Especifica o formato de hora
+  moment().locale('pt-br');
+  moment().format('kk:mm:ss');
+  // moment().utcOffset(-3*60); // UTC - 3:00
   // Modifica o comportamento da opção fechar no menu lateral
   const fecharTab = document.getElementById('fechar-tab');
   fecharTab.addEventListener('click', (e) => {
@@ -92,7 +141,7 @@ window.onload = function () {
   plotterBat.addPlot('batimento', []);
 
   plotterOxi= new SerialPlotter(document.getElementById('oxiCanvas'), 'Oxigenação');
-  plotterOxi.addPlot('oxi', []);
+  plotterOxi.addPlot('oxigenacao', []);
 
   // Obtem a lista de portas seriais disponíveis
   // e atualiza o menu de portas    
@@ -126,6 +175,7 @@ window.onload = function () {
         sPort.onData(atualizaDados);
         await sPort.open(botaoDrop.innerText, {baudRate: 115200});
         conectar.innerText = 'Desconectar';
+        limpaDados();
       } catch(e) {
         console.log('Erro ao abrir porta');
         sPort = null;
