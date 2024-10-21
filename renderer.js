@@ -94,6 +94,7 @@ function limpaDados() {
   acumulaOxi= [];
   acumulaTemp = [];
   horaDaAmostra = [];
+  caminhoDoArquivo = null;
 }
 
 function constroiAmostras(amostras, timestamps) {
