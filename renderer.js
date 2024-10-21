@@ -27,15 +27,19 @@ let incrementarArquivo = false;
 // Há uma tarefa de escrita ainda não concluída
 let escritaPendente = false;
 
+const formatoHora = new Intl.DateTimeFormat(
+  'pt-BR',
+  {
+    second: '2-digit', minute: '2-digit', hour: '2-digit'
+  }
+).format;
 function serializaDados(quantidade) {
   const total = horaDaAmostra.length > quantidade ? quantidade : horaDaAmostra.length;
   let dados = '';
   for(let i = 0; i < total; i++) {
     const data = new Date(horaDaAmostra[i]);
     dados += 
-      data.getHours() + ':' +
-      data.getMinutes() + ':' +
-      data.getSeconds() + ' - ' +
+      formatoHora(data.getTime()) + ' - ' +
       acumulaTemp[i] + '°C - ' +
       acumulaBat[i] + 'bpm - ' +
       acumulaOxi[i] + '%' + EOL;
