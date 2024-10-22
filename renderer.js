@@ -79,10 +79,25 @@ function limpaDados() {
   acumulaTemp = [];
   horaDaAmostra = [];
   caminhoDoArquivo = null;
+  contagemRejeitadas = 0;
+  contagem.innerText = 'Amostras: 0';
+  rejeitadas.innerText = 'Amostras rejeitadas: 0';
+}
+
+function validaAmostra(temperatura, oxigenacao, batimento) {
+  if(temperatura > 50 || temperatura < 0 ||
+     oxigenacao > 100 || oxigenacao < 0 ||
+     batimento > 200 || batimento < 0)
+    return false;
+
+  return true;
 }
 
 // Recebe uma nova amostra e exibe nos gráficos
 const contagem = document.getElementById('contagem');
+let contagemRejeitadas = 0;
+const rejeitadas = document.getElementById('rejeitadas');
+const filtro = document.getElementById('filtro');
 function atualizaDados(amostra, novoTimestamp) {
   const [ temperatura, oxigenacao, batimento ] = amostra.split(':');
 
@@ -90,6 +105,12 @@ function atualizaDados(amostra, novoTimestamp) {
   // caso contrário, a amostra é descartada
   if(horaDaAmostra.length === 0 || 
     novoTimestamp - horaDaAmostra[horaDaAmostra.length - 1] >= 1000) {
+
+    if(filtro.checked && !validaAmostra(temperatura, oxigenacao, batimento)) {
+      contagemRejeitadas += 1;
+      rejeitadas.innerText = 'Amostras rejeitadas: ' + contagemRejeitadas;
+      return;
+    }
 
     acumulaBat.push(Number(batimento));
     acumulaOxi.push(Number(oxigenacao));
