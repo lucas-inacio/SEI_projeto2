@@ -256,4 +256,27 @@ window.onload = function () {
       }
     }
   });
+
+  // Controla a visibilidade dos gráficos
+  const graficos = [];
+  graficos.push({
+    check: document.getElementById('tempCheck'),
+    canvas: document.getElementById('tempCanvas')
+  });
+  graficos.push({
+    check: document.getElementById('batCheck'),
+    canvas: document.getElementById('batimentoCanvas')
+  });
+  graficos.push({
+    check: document.getElementById('oxiCheck'),
+    canvas: document.getElementById('oxiCanvas')
+  });
+  for(let grafico of graficos) {
+    grafico.check.addEventListener('click', (e) => {
+      if(grafico.canvas.style.visibility === 'hidden')
+        grafico.canvas.style.visibility = 'visible';
+      else
+        grafico.canvas.style.visibility = 'hidden';
+    });
+  }
 };
