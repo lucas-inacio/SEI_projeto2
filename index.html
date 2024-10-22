@@ -52,10 +52,10 @@
           <div tabindex="0" role="tabpanel" id="salv" aria-labelledby="salv-tab" class="tab-pane fade">
             <form>
               <div class="mb-3">
-                <label for="formFile" class="form-label">Escolha onde salvar</label>
-                <input class="form-control" type="file" id="formFile">
+                <!-- <label for="formFile" class="form-label">Escolha onde salvar</label>
+                <input class="form-control" type="file" id="formFile"> -->
                 <input id="checkFile" class="form-check-input" type="checkbox" value="">
-                <label for="checkFile" class="form-check-label">Automático (incremental)</label>
+                <label for="checkFile" class="form-check-label">Incremental</label>
               </div>
               <button id="salvarDados" class="btn btn-primary" type="submit">Salvar</button>
             </form>
@@ -69,6 +69,21 @@
     <footer class="row text-center">
       <h3>Outro teste</h3>
     </footer>
+  </div>
+  <div class="modal fade" id="aviso" tabindex="-1" aria-labelledby="avisoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="avisoLabel">Mensagem</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="avisoTexto">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
   <script src="popper.min.js" type="text/javascript"></script>
   <script src="bootstrap.min.js" type="text/javascript"></script>

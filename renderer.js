@@ -1,4 +1,5 @@
-const { ipcRenderer, webUtils } = require('electron');
+const { timeStamp } = require('console');
+const { ipcRenderer } = require('electron');
 const fs = require('fs').promises;
 const { EOL } = require('os');
 
@@ -24,8 +25,6 @@ let plotterBat = null;
 let caminhoDoArquivo = null;
 // false -> substitui arquivo; true -> salva periodicamente no mesmo arquivo
 let incrementarArquivo = false;
-// Há uma tarefa de escrita ainda não concluída
-let escritaPendente = false;
 
 const formatoHora = new Intl.DateTimeFormat(
   'pt-BR',
@@ -33,10 +32,10 @@ const formatoHora = new Intl.DateTimeFormat(
     second: '2-digit', minute: '2-digit', hour: '2-digit'
   }
 ).format;
-function serializaDados(quantidade) {
-  const total = horaDaAmostra.length > quantidade ? quantidade : horaDaAmostra.length;
+
+function serializaDados() {
   let dados = '';
-  for(let i = 0; i < total; i++) {
+  for(let i = 0; i < horaDaAmostra.length; i++) {
     const data = new Date(horaDaAmostra[i]);
     dados += 
       formatoHora(data.getTime()) + ' - ' +
@@ -109,8 +108,7 @@ function atualizaDados(amostra, novoTimestamp) {
   const [ temperatura, oxigenacao, batimento ] = amostra.split(':');
 
   // Amostras devem ter no mínimo um segundo de distância entre si
-  // Se o timestamp for igual (até +-999 milisegundos), substitui
-  // pelo último valor fornecido
+  // caso contrário, a amostra é descartada
   if(horaDaAmostra.length === 0 || 
     novoTimestamp - horaDaAmostra[horaDaAmostra.length - 1] >= 1000) {
 
@@ -118,28 +116,14 @@ function atualizaDados(amostra, novoTimestamp) {
     acumulaOxi.push(Number(oxigenacao));
     acumulaTemp.push(Number(temperatura));
     horaDaAmostra.push(novoTimestamp);
-  } else {
-    acumulaBat[acumulaBat.length - 1] = batimento;
-    acumulaOxi[acumulaOxi.length - 1] = oxigenacao;
-    acumulaTemp[acumulaTemp.length - 1] = temperatura;
-    horaDaAmostra[horaDaAmostra.length - 1] = novoTimestamp;
+
+    // Atualiza o gráfico
+    plotterBat.pushData('batimento', { x: novoTimestamp, y: batimento });
+
+    plotterOxi.pushData('oxigenacao', { x: novoTimestamp, y: oxigenacao });
+
+    plotterTemp.pushData('temperatura', { x: novoTimestamp, y: temperatura });
   }
-
-  // Atualiza o gráfico
-  plotterBat.setData(
-    'batimento',
-    constroiAmostras(
-      acumulaBat.slice(-AMOSTRAS_MAX), horaDaAmostra.slice(-AMOSTRAS_MAX)));
-
-  plotterOxi.setData(
-    'oxigenacao',
-    constroiAmostras(
-      acumulaOxi.slice(-AMOSTRAS_MAX), horaDaAmostra.slice(-AMOSTRAS_MAX)));
-
-  plotterTemp.setData(
-    'temperatura',
-    constroiAmostras(
-      acumulaTemp.slice(-AMOSTRAS_MAX), horaDaAmostra.slice(-AMOSTRAS_MAX)));
 }
 
 // Atalho para mudar o texto do botão de Conectar/Desconectar
@@ -248,36 +232,30 @@ window.onload = function () {
 
   // Armazenamento das amostras em arquivo
   const salvar = document.getElementById('salvarDados');
+  const aviso = new bootstrap.Modal(document.getElementById('aviso'));
+  const avisoTexto = document.getElementById('avisoTexto');
   salvar.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    if(escritaPendente) {
-      return;
-    }
+    const caminhoDoArquivo = await ipcRenderer.invoke('salvaDados');
+    if(!caminhoDoArquivo) return;
 
-    const campoNomeDoArquivo = document.getElementById('formFile');
     incrementarArquivo = document.getElementById('checkFile').checked;
-    if(campoNomeDoArquivo.files && campoNomeDoArquivo.files.length > 0) {
-      caminhoDoArquivo = webUtils.getPathForFile(campoNomeDoArquivo.files[0]);
 
-      if(incrementarArquivo) {
-        setTimeout(tarefaSalvarArquivo, 1000);
-      } else {
-        const dados = serializaDados(5);
-        console.log(dados);
-        try {
-          await salvarArquivo(caminhoDoArquivo, incrementarArquivo, dados);
-          acumulaBat.splice(0, 5);
-          acumulaTemp.splice(0, 5);
-          acumulaOxi.splice(0, 5);
-          horaDaAmostra.splice(0, 5);
-        } finally {
-          escritaPendente = false;
-        }
-      }
-
-      // console.log(caminhoDoArquivo);
-      // console.log(checkFile.checked);
+    const dados = serializaDados();
+    try {
+      const tamanho = horaDaAmostra.length;
+      await salvarArquivo(caminhoDoArquivo, incrementarArquivo, dados);
+      horaDaAmostra.splice(0, tamanho);
+      acumulaBat.splice(0, tamanho);
+      acumulaOxi.splice(0, tamanho);
+      acumulaTemp.splice(0, tamanho);
+      avisoTexto.innerText = 'Concluído';
+      aviso.show();
+    } catch(e) {
+      console.log(e);
+      avisoTexto.innerText = 'Erro ao salvar arquivo';
+      aviso.show();
     }
-  })
+  });
 };

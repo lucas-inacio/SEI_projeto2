@@ -22,6 +22,10 @@ function createWindow () {
     checaSaida();
   });
 
+  ipcMain.handle('salvaDados', () => {
+    return dialog.showSaveDialogSync(win);
+  });
+
   win.setMenu(null);
   win.loadFile('index.html');
   win.webContents.openDevTools();

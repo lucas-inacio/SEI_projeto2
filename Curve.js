@@ -1,5 +1,6 @@
 class SerialPlotter {
   constructor(canvasContext, titulo, tipo) {
+    this.maximoPontos = 10;
     this.chart = new Chart(canvasContext, {
       type: tipo || 'line',
       data: {
@@ -32,31 +33,6 @@ class SerialPlotter {
           }
         }
       }
-      // options: {
-      //     scales: {
-      //         x: {
-      //             display: false,
-      //             type: 'linear',
-      //             min: 0,
-      //             max: this.pointCount,
-      //         },
-      // xAxes: [{
-      //     display: false,
-      //     type: 'linear',
-      //     ticks: {
-      //        max: this.pointCount,
-      //        min: 0,
-      //        stepSize: 1,
-      //     }
-      // }],
-      // yAxes: [{
-      //     ticks: {
-      //         min: 0,
-      //         max: 1
-      //     }
-      // }]
-      // }
-      // }
     });
   }
   
@@ -72,10 +48,14 @@ class SerialPlotter {
     this.chart.update();
   }
 
-  setData(rotulo, dados) {
+  pushData(rotulo, dado) {
     for(let i in this.chart.data.datasets) {
       if(this.chart.data.datasets[i].label === rotulo) {
-        this.chart.data.datasets[i].data = dados;
+        this.chart.data.datasets[i].data.push(dado);
+        const tamanho = this.chart.data.datasets[i].data.length;
+        if(tamanho > this.maximoPontos) {
+          this.chart.data.datasets[i].data.splice(0, tamanho - this.maximoPontos);
+        }
         this.chart.update();
       }
     }
