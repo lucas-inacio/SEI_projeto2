@@ -3,6 +3,7 @@ class SerialPlotter {
     this.maximoPontos = 10;
     this.chart = new Chart(canvasContext, {
       type: tipo || 'line',
+      labels: [],
       data: {
         datasets: []
       },
@@ -21,15 +22,9 @@ class SerialPlotter {
         },
         scales: {
           x: {
-            type: 'time',
-            time: {
-              displayFormat: {
-                second: 'HH:mm:ss'
-              },
-              unit: 'second'
-            },
+            type: 'category',
             ticks: {
-              source: 'data'
+              source: 'labels'
             }
           },
           y: {
@@ -57,18 +52,21 @@ class SerialPlotter {
   
   removeAllPlots() {
     this.chart.data.datasets = [];
+    this.chart.data.labels = [];
     this.chart.update();
   }
 
   // Adiciona uma amostra ao gráfico, removendo amostras antigas
   // caso o tamanho ultrapasse this.maximoPontos
-  pushData(rotulo, dado) {
+  pushData(rotulo, x, y) {
     for(let i in this.chart.data.datasets) {
       if(this.chart.data.datasets[i].label === rotulo) {
-        this.chart.data.datasets[i].data.push(dado);
+        this.chart.data.datasets[i].data.push(y);
+        this.chart.data.labels.push(x);
         const tamanho = this.chart.data.datasets[i].data.length;
         if(tamanho > this.maximoPontos) {
           this.chart.data.datasets[i].data.splice(0, tamanho - this.maximoPontos);
+          this.chart.data.labels.splice(0, tamanho - this.maximoPontos);
         }
         this.chart.update();
       }
@@ -110,6 +108,7 @@ class SerialPlotter {
   clear() {
     for (let data of this.chart.data.datasets)
       data.data = [];
+    this.chart.data.labels = [];
     this.chart.update();
   }
 }

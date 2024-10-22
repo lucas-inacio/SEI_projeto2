@@ -118,9 +118,9 @@ function atualizaDados(amostra, novoTimestamp) {
     horaDaAmostra.push(novoTimestamp);
 
     // Atualiza o gráfico
-    plotterBat.pushData('batimento', { x: novoTimestamp, y: batimento });
-    plotterOxi.pushData('oxigenacao', { x: novoTimestamp, y: oxigenacao });
-    plotterTemp.pushData('temperatura', { x: novoTimestamp, y: temperatura });
+    plotterBat.pushData('batimento', formatoHora(novoTimestamp), batimento);
+    plotterOxi.pushData('oxigenacao', formatoHora(novoTimestamp), oxigenacao);
+    plotterTemp.pushData('temperatura', formatoHora(novoTimestamp), temperatura);
 
     // Atualiza a contagem de amostras
     contagem.innerText = 'Amostras: ' + horaDaAmostra.length;
