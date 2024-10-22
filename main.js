@@ -25,7 +25,7 @@ function createWindow () {
 
   // Exibe diálogo para salvar arquivo
   ipcMain.handle('salvaDados', () => {
-    return dialog.showSaveDialogSync(win);
+    return dialog.showSaveDialogSync(win, { title: 'Salvar' });
   });
 
   win.setMenu(null);
@@ -50,7 +50,8 @@ app.on('activate', () => {
 async function checaSaida() {
   try {
     const resultado = await dialog.showMessageBox(
-      win, { 
+      win, {
+        title: 'Confirmação',
         message: 'Deseja sair?',
         buttons: [ 'Não', 'Sim' ],
         cancelId: 0,
