@@ -96,14 +96,6 @@ function limpaDados() {
   caminhoDoArquivo = null;
 }
 
-function constroiAmostras(amostras, timestamps) {
-  const saida = [];
-  for(let i in amostras) {
-    saida.push({x: timestamps[i], y: amostras[i]});
-  }
-  return saida;
-}
-
 function atualizaDados(amostra, novoTimestamp) {
   const [ temperatura, oxigenacao, batimento ] = amostra.split(':');
 
