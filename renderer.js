@@ -177,14 +177,20 @@ window.onload = function () {
   plotterTemp = new SerialPlotter(document.getElementById('tempCanvas'), 'Temperatura');
   plotterTemp.setYLim(0, 50);
   plotterTemp.addPlot('temperatura', []);
+  plotterTemp.setLineColor('temperatura', '#f7e665');
+  plotterTemp.setFillColor('temperatura', '#ffae4a');
   
   plotterBat= new SerialPlotter(document.getElementById('batimentoCanvas'), 'Batimento', 'bar');
   plotterBat.setYLim(0, 200);
   plotterBat.addPlot('batimento', []);
+  plotterBat.setLineColor('batimento', '#9BD0F5');
+  plotterBat.setFillColor('batimento', '#FFA2EB');
   
   plotterOxi= new SerialPlotter(document.getElementById('oxiCanvas'), 'Oxigenação');
   plotterOxi.setYLim(0, 100);
   plotterOxi.addPlot('oxigenacao', []);
+  plotterOxi.setLineColor('oxigenacao', '#7df76f');
+  plotterOxi.setFillColor('oxigenacao', '#12b000');
 
   // Obtem a lista de portas seriais disponíveis
   // e atualiza o menu de portas a cada 3 segundos
