@@ -33,6 +33,13 @@ const formatoHora = new Intl.DateTimeFormat(
   }
 ).format;
 
+const aviso = new bootstrap.Modal(document.getElementById('aviso'));
+const avisoTexto = document.getElementById('avisoTexto');
+function exibeMensagem(mensagem) {
+  avisoTexto.innerText = mensagem;
+  aviso.show();
+}
+
 function serializaDados() {
   let dados = '';
   for(let i = 0; i < horaDaAmostra.length; i++) {
@@ -225,21 +232,22 @@ window.onload = function () {
         conectar.innerText = 'Desconectar';
         limpaDados();
       } catch(e) {
-        console.log('Erro ao abrir porta');
         sPort = null;
+        exibeMensagem('Não foi possível conectar');
       }
     }
   });
 
   // Armazenamento das amostras em arquivo
   const salvar = document.getElementById('salvarDados');
-  const aviso = new bootstrap.Modal(document.getElementById('aviso'));
-  const avisoTexto = document.getElementById('avisoTexto');
   salvar.addEventListener('click', async (e) => {
     e.preventDefault();
 
     const caminhoDoArquivo = await ipcRenderer.invoke('salvaDados');
-    if(!caminhoDoArquivo) return;
+    if(!caminhoDoArquivo) {
+      exibeMensagem('Escolha um caminho válido');
+      return;
+    }
 
     incrementarArquivo = document.getElementById('checkFile').checked;
 
@@ -251,12 +259,9 @@ window.onload = function () {
       acumulaBat.splice(0, tamanho);
       acumulaOxi.splice(0, tamanho);
       acumulaTemp.splice(0, tamanho);
-      avisoTexto.innerText = 'Concluído';
-      aviso.show();
+      exibeMensagem('Concluído');
     } catch(e) {
-      console.log(e);
-      avisoTexto.innerText = 'Erro ao salvar arquivo';
-      aviso.show();
+      exibeMensagem('Erro ao salvar arquivo');
     }
   });
 };
