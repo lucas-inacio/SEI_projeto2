@@ -7,6 +7,18 @@ class SerialPlotter {
         datasets: []
       },
       options: {
+        animation: false,
+        animations: {
+          colors: false,
+          x: false,
+        },
+        transitions: {
+          active: {
+            animation: {
+              duration: 0
+            }
+          }
+        },
         scales: {
           x: {
             type: 'time',
