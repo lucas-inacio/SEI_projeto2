@@ -59,26 +59,6 @@ function solicitaSaida() {
   ipcRenderer.invoke('checaSaida');
 }
 
-async function tarefaSalvarArquivo() {
-  if(caminhoDoArquivo) {
-    if(horaDaAmostra.length >= AMOSTRAS_MAX+5 && !escritaPendente) {
-      const dados = serializaDados(5);
-      try {
-        await salvarArquivo(caminhoDoArquivo, incrementarArquivo, dados);
-        acumulaBat.splice(0, 5);
-        acumulaTemp.splice(0, 5);
-        acumulaOxi.splice(0, 5);
-        horaDaAmostra.splice(0, 5);
-      } catch(e) {
-        console.log(e);
-      }
-    }
-
-    if(incrementarArquivo)
-      setTimeout(tarefaSalvarArquivo, 1000);
-  }
-}
-
 async function salvarArquivo(caminho, incrementar, dados) {
   try {
     if(incrementar) {
