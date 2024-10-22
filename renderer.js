@@ -19,8 +19,6 @@ let plotterBat = null;
 
 // Informações de armazenamento de arquivos
 let caminhoDoArquivo = null;
-// false -> substitui arquivo; true -> salva periodicamente no mesmo arquivo
-let incrementarArquivo = false;
 
 const formatoHora = new Intl.DateTimeFormat(
   'pt-BR',
@@ -84,6 +82,7 @@ function limpaDados() {
 }
 
 // Recebe uma nova amostra e exibe nos gráficos
+const contagem = document.getElementById('contagem');
 function atualizaDados(amostra, novoTimestamp) {
   const [ temperatura, oxigenacao, batimento ] = amostra.split(':');
 
@@ -101,6 +100,9 @@ function atualizaDados(amostra, novoTimestamp) {
     plotterBat.pushData('batimento', { x: novoTimestamp, y: batimento });
     plotterOxi.pushData('oxigenacao', { x: novoTimestamp, y: oxigenacao });
     plotterTemp.pushData('temperatura', { x: novoTimestamp, y: temperatura });
+
+    // Atualiza a contagem de amostras
+    contagem.innerText = 'Amostras: ' + horaDaAmostra.length;
   }
 }
 

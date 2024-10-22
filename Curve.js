@@ -95,14 +95,14 @@ class SerialPlotter {
   }
   
   setXLim(min, max) {
-    this.chart.options.scales.x.sugesttedMin = min;
-    this.chart.options.scales.x.sugesttedMax = max;
+    this.chart.options.scales.x.min = min;
+    this.chart.options.scales.x.max = max;
     this.chart.update();
   }
   
   setYLim(min, max) {
-    this.chart.options.scales.y.sugesttedMin = min;
-    this.chart.options.scales.y.sugesttedMax = max;
+    this.chart.options.scales.y.min = min;
+    this.chart.options.scales.y.max = max;
     this.chart.update();
   }
   
