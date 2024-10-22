@@ -84,6 +84,8 @@ function limpaDados() {
   rejeitadas.innerText = 'Amostras rejeitadas: 0';
 }
 
+// Verifica se as amostras estão dentro de valores aceitáveis
+// Retorna true se for o caso
 function validaAmostra(temperatura, oxigenacao, batimento) {
   if(temperatura > 50 || temperatura < 0 ||
      oxigenacao > 100 || oxigenacao < 0 ||
@@ -93,11 +95,12 @@ function validaAmostra(temperatura, oxigenacao, batimento) {
   return true;
 }
 
-// Recebe uma nova amostra e exibe nos gráficos
+// Contadores de amostras exibidos no canto inferior esquerdo
 const contagem = document.getElementById('contagem');
 let contagemRejeitadas = 0;
 const rejeitadas = document.getElementById('rejeitadas');
 const filtro = document.getElementById('filtro');
+// Recebe uma nova amostra e exibe nos gráficos
 function atualizaDados(amostra, novoTimestamp) {
   const [ temperatura, oxigenacao, batimento ] = amostra.split(':');
 

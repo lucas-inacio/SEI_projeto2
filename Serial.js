@@ -50,7 +50,7 @@ class Serial {
         if (this.port.isOpen) this.port.close();
     }
 
-    // func deve ser do tipo func([])
+    // Define o callback que será chamado quando receber dados
     onData(func) {
         this.onDataCallback = func;
     }
