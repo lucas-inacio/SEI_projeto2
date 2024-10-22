@@ -169,10 +169,6 @@ function constroiMenu(itens) {
 }
 
 window.onload = function () {
-  // Especifica o formato de hora
-  moment().locale('pt-br');
-  moment().format('kk:mm:ss');
-
   // Modifica o comportamento da opção fechar no menu lateral
   const fecharTab = document.getElementById('fechar-tab');
   fecharTab.addEventListener('click', (e) => {
