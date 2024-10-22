@@ -15,7 +15,7 @@
       <div class="col-sm-3 flex-column d-flex justify-content-between">
         <div id="myTab" class="nav nav-pills flex-column" role="tablist" aria-orientation="vertical">
           <button class="nav-link active" aria-selected="true" role="tab" aria-controls="pill-param" data-bs-toggle="pill" id="param-tab" data-bs-target="#param">Parâmetros</button>
-          <button class="nav-link" aria-selected="false" role="tab" aria-controls="pill-salv" data-bs-toggle="pill" id="salv-tab"  data-bs-target="#salv">Salvar dados</button>
+          <button class="nav-link" aria-selected="false" role="tab" aria-controls="pill-salv" id="salv-tab">Salvar dados</button>
           <button class="nav-link" aria-selected="false" role="tab" aria-controls="pill-ajuda" data-bs-toggle="pill" id="ajuda-tab"  data-bs-target="#ajuda">Ajuda</button>
           <button class="nav-link" aria-selected="false" role="tab" aria-controls="pill-fechar" id="fechar-tab">Fechar</button>
         </div>
@@ -44,15 +44,6 @@
                 <canvas id="oxiCanvas"></canvas>
               </div>
             </div>            
-          </div>
-          <div tabindex="0" role="tabpanel" id="salv" aria-labelledby="salv-tab" class="tab-pane rounded shadow p-3 fade  h-100">
-            <form>
-              <div class="mb-3">
-                <input id="checkFile" class="form-check-input" type="checkbox" value="">
-                <label for="checkFile" class="form-check-label">Incremental</label>
-              </div>
-              <button id="salvarDados" class="btn btn-primary" type="submit">Salvar</button>
-            </form>
           </div>
           <div tabindex="0" role="tabpanel" id="ajuda" aria-labelledby="ajuda-tab" class="tab-pane  text-center rounded shadow p-3 fade h-100">
             Conecte-se a uma porta serial válida utilizando o menu inferior esquerdo. É possível salvar as amostras em um arquivo

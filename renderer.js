@@ -60,16 +60,10 @@ function solicitaSaida() {
 }
 
 // Salva os dados das amostras no arquivo especificado
-// em 'caminho'. Se 'incrementar' for true, inclui os dados
-// no arquivo, caso escolha um arquivo existente.
-// Caso contrário, sobrescreve.
-async function salvarArquivo(caminho, incrementar, dados) {
+// em 'caminho'. O arquivo é sobrescrito.
+async function salvarArquivo(caminho, dados) {
   try {
-    if(incrementar) {
-      await fs.appendFile(caminho, dados, { flush: true });
-    } else {
-      await fs.writeFile(caminho, dados, { flush: true });
-    }
+    await fs.writeFile(caminho, dados, { flush: true });
   } catch(e) {
     console.log(e);
     throw e;
@@ -164,6 +158,26 @@ window.onload = function () {
     // deseja encerrar a aplicação. Realiza as ações necessárias antes.
     solicitaSaida();
   });
+
+  // Armazenamento das amostras em arquivo
+  const salvarTab = document.getElementById('salv-tab');
+  salvarTab.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const caminhoDoArquivo = await ipcRenderer.invoke('salvaDados');
+    if(!caminhoDoArquivo) {
+      exibeMensagem('Escolha um caminho válido');
+      return;
+    }
+
+    const dados = serializaDados(); // Transforma os dados em texto
+    try {
+      await salvarArquivo(caminhoDoArquivo, dados);
+      exibeMensagem('Concluído');
+    } catch(e) {
+      exibeMensagem('Erro ao salvar arquivo');
+    }
+  });
   
   // Adiciona os gráficos às telas
   plotterTemp = new SerialPlotter(document.getElementById('tempCanvas'), 'Temperatura');
@@ -221,34 +235,6 @@ window.onload = function () {
         sPort = null;
         exibeMensagem('Não foi possível conectar');
       }
-    }
-  });
-
-  // Armazenamento das amostras em arquivo
-  const salvar = document.getElementById('salvarDados');
-  salvar.addEventListener('click', async (e) => {
-    e.preventDefault();
-
-    const caminhoDoArquivo = await ipcRenderer.invoke('salvaDados');
-    if(!caminhoDoArquivo) {
-      exibeMensagem('Escolha um caminho válido');
-      return;
-    }
-
-    incrementarArquivo = document.getElementById('checkFile').checked;
-
-    const dados = serializaDados(); // Transforma os dados em texto
-    try {
-      const tamanho = horaDaAmostra.length;
-      await salvarArquivo(caminhoDoArquivo, incrementarArquivo, dados);
-      // Remove amostras antigas
-      horaDaAmostra.splice(0, tamanho);
-      acumulaBat.splice(0, tamanho);
-      acumulaOxi.splice(0, tamanho);
-      acumulaTemp.splice(0, tamanho);
-      exibeMensagem('Concluído');
-    } catch(e) {
-      exibeMensagem('Erro ao salvar arquivo');
     }
   });
 };
