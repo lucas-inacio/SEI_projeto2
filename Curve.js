@@ -37,6 +37,10 @@ class SerialPlotter {
           title: {
             display: true,
             text: titulo,
+            position: 'left'
+          },
+          legend: {
+            display: false,
           }
         }
       }
