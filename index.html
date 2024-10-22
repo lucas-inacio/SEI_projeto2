@@ -48,7 +48,7 @@
       <div class="col-sm-9">
         <div class="tab-content h-100">
           <div tabindex="0" role="tabpanel" id="param" aria-labelledby="param-tab" class="tab-pane rounded shadow p-3 fade show active h-100">
-            <div id="charts" class="container-fluid h-100">
+            <div id="charts" class="container-fluid h-100 d-flex flex-column justify-content-between">
               <div class="chart-container">
                 <canvas id="tempCanvas"></canvas>
               </div>
@@ -58,20 +58,22 @@
               <div class="chart-container">
                 <canvas id="oxiCanvas"></canvas>
               </div>
-              <div class="form-check form-check-inline">
-                <input id="tempCheck" class="form-check-input" type="checkbox" checked>
-                <label for="tempCheck" class="form-check-label">Temperatura</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input id="batCheck" class="form-check-input" type="checkbox" checked>
-                <label for="batCheck" class="form-check-label">Batimento</label>
-              </div>            
-              <div class="form-check form-check-inline">
-                <input id="oxiCheck" class="form-check-input" type="checkbox" checked>
-                <label for="oxiCheck" class="form-check-label">Oxigenação</label>
+              <div id="formGraficos">
+                <div class="form-check form-check-inline">
+                  <input id="tempCheck" class="form-check-input" type="checkbox" checked>
+                  <label for="tempCheck" class="form-check-label">Temperatura</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input id="batCheck" class="form-check-input" type="checkbox" checked>
+                  <label for="batCheck" class="form-check-label">Batimento</label>
+                </div>            
+                <div class="form-check form-check-inline">
+                  <input id="oxiCheck" class="form-check-input" type="checkbox" checked>
+                  <label for="oxiCheck" class="form-check-label">Oxigenação</label>
+                </div>
               </div>
             </div>
-          </div>
+            </div>
           <div tabindex="0" role="tabpanel" id="ajuda" aria-labelledby="ajuda-tab" class="tab-pane rounded shadow p-3 fade h-100">
             <ul class="list-group list-group-flush list-group-numbered">
               <li class="list-group-item">Conecte-se a uma porta serial válida utilizando o menu inferior esquerdo</li>
