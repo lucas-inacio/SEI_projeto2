@@ -48,9 +48,15 @@ app.on('activate', () => {
 async function checaSaida() {
   try {
     const resultado = await dialog.showMessageBox(
-      win, {message: 'Deseja sair?', buttons: [ 'Sim', 'Não' ]});
+      win, { 
+        message: 'Deseja sair?',
+        buttons: [ 'Não', 'Sim' ],
+        cancelId: 0,
+        type: 'question' 
+      });
       
-    if(resultado.response === 0) {
+    if(resultado.response === 1) {
+      console.log(resultado.response);
       app.exit();
     }
   } catch(e) {
