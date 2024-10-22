@@ -175,12 +175,15 @@ window.onload = function () {
   
   // Adiciona os gráficos às telas
   plotterTemp = new SerialPlotter(document.getElementById('tempCanvas'), 'Temperatura');
+  plotterTemp.setYLim(0, 50);
   plotterTemp.addPlot('temperatura', []);
   
   plotterBat= new SerialPlotter(document.getElementById('batimentoCanvas'), 'Batimento', 'bar');
+  plotterBat.setYLim(0, 200);
   plotterBat.addPlot('batimento', []);
-
+  
   plotterOxi= new SerialPlotter(document.getElementById('oxiCanvas'), 'Oxigenação');
+  plotterOxi.setYLim(0, 100);
   plotterOxi.addPlot('oxigenacao', []);
 
   // Obtem a lista de portas seriais disponíveis
