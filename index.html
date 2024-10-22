@@ -8,8 +8,8 @@
 </head>
 <body class="vh-100">
   <div class="container-fluid vh-100 d-flex flex-column justify-content-between">
-    <header class="row text-center h-30">
-      <h1>Teste</h1>
+    <header class="row text-center h-30 mb-3 mt-3">
+      <h1>Sistemas Embarcados: Halan Queiroz & Lucas Viegas</h1>
     </header>
     <main class="row flex-fill w-80">
       <div class="col-sm-3 flex-column d-flex justify-content-between">
@@ -34,40 +34,37 @@
         </div>
       </div>
       <div class="col-sm-9">
-        <div class="tab-content">
-          <!-- <canvas>Teste</canvas> -->
-          <div tabindex="0" role="tabpanel" id="param" aria-labelledby="param-tab" class="tab-pane fade show active">
-            <div class="container-fluid h-100">
-              <div class="p-1">
+        <div class="tab-content h-100">
+          <div tabindex="0" role="tabpanel" id="param" aria-labelledby="param-tab" class="tab-pane rounded shadow p-3 fade show active h-100">
+            <div id="charts" class="container-fluid h-100">
+              <div class="chart-container">
                 <canvas id="tempCanvas"></canvas>
               </div>
-              <div class="p-1">
+              <div class="chart-container">
                 <canvas id="batimentoCanvas"></canvas>
               </div>
-              <div class="p-1">
+              <div class="chart-container">
                 <canvas id="oxiCanvas"></canvas>
               </div>
             </div>            
           </div>
-          <div tabindex="0" role="tabpanel" id="salv" aria-labelledby="salv-tab" class="tab-pane fade">
+          <div tabindex="0" role="tabpanel" id="salv" aria-labelledby="salv-tab" class="tab-pane rounded shadow p-3 fade  h-100">
             <form>
               <div class="mb-3">
-                <!-- <label for="formFile" class="form-label">Escolha onde salvar</label>
-                <input class="form-control" type="file" id="formFile"> -->
                 <input id="checkFile" class="form-check-input" type="checkbox" value="">
                 <label for="checkFile" class="form-check-label">Incremental</label>
               </div>
               <button id="salvarDados" class="btn btn-primary" type="submit">Salvar</button>
             </form>
           </div>
-          <div tabindex="0" role="tabpanel" id="ajuda" aria-labelledby="ajuda-tab" class="tab-pane fade">
+          <div tabindex="0" role="tabpanel" id="ajuda" aria-labelledby="ajuda-tab" class="tab-pane rounded shadow p-3 fade h-100">
             Ajuda
           </div>
         </div>
       </div>
     </main>
-    <footer class="row text-center">
-      <h3>Outro teste</h3>
+    <footer class="row text-center mb-3 mt-3">
+      <h3>Desenvolvido por Halan Queiroz e Lucas Viegas</h3>
     </footer>
   </div>
   <div class="modal fade" id="aviso" tabindex="-1" aria-labelledby="avisoLabel" aria-hidden="true">
