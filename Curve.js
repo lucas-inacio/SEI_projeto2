@@ -60,6 +60,8 @@ class SerialPlotter {
     this.chart.update();
   }
 
+  // Adiciona uma amostra ao gráfico, removendo amostras antigas
+  // caso o tamanho ultrapasse this.maximoPontos
   pushData(rotulo, dado) {
     for(let i in this.chart.data.datasets) {
       if(this.chart.data.datasets[i].label === rotulo) {

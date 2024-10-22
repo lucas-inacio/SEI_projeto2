@@ -18,10 +18,12 @@ function createWindow () {
     checaSaida();
   });
 
+  // Pergunta ao usuário se quer encerrar a aplicação
   ipcMain.handle('checaSaida', () => {
     checaSaida();
   });
 
+  // Exibe diálogo para salvar arquivo
   ipcMain.handle('salvaDados', () => {
     return dialog.showSaveDialogSync(win);
   });

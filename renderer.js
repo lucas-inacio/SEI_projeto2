@@ -1,10 +1,6 @@
-const { timeStamp } = require('console');
 const { ipcRenderer } = require('electron');
 const fs = require('fs').promises;
 const { EOL } = require('os');
-
-// Quantidade máxima de amostras a exibir
-const AMOSTRAS_MAX = 10;
 
 // Porta serial aberta atualmente
 let sPort = null;
@@ -33,6 +29,8 @@ const formatoHora = new Intl.DateTimeFormat(
   }
 ).format;
 
+// Caixa de mensagem usada para dar feedback ao usuário
+// (erros, avisos, etc.)
 const aviso = new bootstrap.Modal(document.getElementById('aviso'));
 const avisoTexto = document.getElementById('avisoTexto');
 function exibeMensagem(mensagem) {
@@ -40,6 +38,8 @@ function exibeMensagem(mensagem) {
   aviso.show();
 }
 
+// Transforma as amostras em formato de texto apropriado
+// para armazenar em arquivo
 function serializaDados() {
   let dados = '';
   for(let i = 0; i < horaDaAmostra.length; i++) {
@@ -59,6 +59,10 @@ function solicitaSaida() {
   ipcRenderer.invoke('checaSaida');
 }
 
+// Salva os dados das amostras no arquivo especificado
+// em 'caminho'. Se 'incrementar' for true, inclui os dados
+// no arquivo, caso escolha um arquivo existente.
+// Caso contrário, sobrescreve.
 async function salvarArquivo(caminho, incrementar, dados) {
   try {
     if(incrementar) {
@@ -72,6 +76,8 @@ async function salvarArquivo(caminho, incrementar, dados) {
   }
 }
 
+// Coloca a aplicação no estado inicial, removendo dados
+// e onfiguração anterior
 function limpaDados() {
   if(plotterBat) plotterBat.clear();
   if(plotterOxi) plotterOxi.clear();
@@ -83,6 +89,7 @@ function limpaDados() {
   caminhoDoArquivo = null;
 }
 
+// Recebe uma nova amostra e exibe nos gráficos
 function atualizaDados(amostra, novoTimestamp) {
   const [ temperatura, oxigenacao, batimento ] = amostra.split(':');
 
@@ -98,9 +105,7 @@ function atualizaDados(amostra, novoTimestamp) {
 
     // Atualiza o gráfico
     plotterBat.pushData('batimento', { x: novoTimestamp, y: batimento });
-
     plotterOxi.pushData('oxigenacao', { x: novoTimestamp, y: oxigenacao });
-
     plotterTemp.pushData('temperatura', { x: novoTimestamp, y: temperatura });
   }
 }
@@ -150,7 +155,7 @@ window.onload = function () {
   // Especifica o formato de hora
   moment().locale('pt-br');
   moment().format('kk:mm:ss');
-  // moment().utcOffset(-3*60); // UTC - 3:00
+
   // Modifica o comportamento da opção fechar no menu lateral
   const fecharTab = document.getElementById('fechar-tab');
   fecharTab.addEventListener('click', (e) => {
@@ -196,7 +201,8 @@ window.onload = function () {
   };
   obtemPortas();
 
-  // Habilita porta serial escolhida
+  // Habilita porta serial escolhida quando o botão
+  // Conectar é pressionado
   const conectar = document.getElementById('conectar');
   conectar.addEventListener('click', async (e) => {
     if(sPort) {
@@ -231,10 +237,11 @@ window.onload = function () {
 
     incrementarArquivo = document.getElementById('checkFile').checked;
 
-    const dados = serializaDados();
+    const dados = serializaDados(); // Transforma os dados em texto
     try {
       const tamanho = horaDaAmostra.length;
       await salvarArquivo(caminhoDoArquivo, incrementarArquivo, dados);
+      // Remove amostras antigas
       horaDaAmostra.splice(0, tamanho);
       acumulaBat.splice(0, tamanho);
       acumulaOxi.splice(0, tamanho);
